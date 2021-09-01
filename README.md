@@ -19,4 +19,4 @@ Step 2. Add the dependency
 	}
 
 
-非Androidx版本可以查看https://gitee.com/a945768271A/SuperCalendar这个网址
+非Androidx版本可以查看https://gitee.com/a945768271A/SuperCalendar 这个网址
