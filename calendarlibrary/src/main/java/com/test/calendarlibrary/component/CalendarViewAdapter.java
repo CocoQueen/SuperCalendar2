@@ -28,7 +28,7 @@ public class CalendarViewAdapter extends PagerAdapter {
 
     private static CalendarDate date = new CalendarDate();
     private ArrayList<Calendar> calendars = new ArrayList<>();
-    private int currentPosition = MonthPager.CURRENT_DAY_INDEX;
+    private int currentPosition;
     private CalendarAttr.CalendarType calendarType = CalendarAttr.CalendarType.MONTH;
     private int rowCount = 0;
     private CalendarDate seedDate;
@@ -39,20 +39,14 @@ public class CalendarViewAdapter extends PagerAdapter {
 
     public CalendarViewAdapter(Context context,
                                OnSelectDateListener onSelectDateListener,
+                               CalendarAttr.CalendarType calendarType,
                                CalendarAttr.WeekArrayType weekArrayType,
                                IDayRenderer dayView) {
         super();
+        this.calendarType = calendarType;
         this.weekArrayType = weekArrayType;
         init(context, onSelectDateListener);
         setCustomDayRenderer(dayView);
-    }
-
-    public static void saveSelectedDate(CalendarDate calendarDate) {
-        date = calendarDate;
-    }
-
-    public static CalendarDate loadSelectedDate() {
-        return date;
     }
 
     private void init(Context context, OnSelectDateListener onSelectDateListener) {
@@ -61,7 +55,7 @@ public class CalendarViewAdapter extends PagerAdapter {
         seedDate = new CalendarDate();
         for (int i = 0; i < 3; i++) {
             CalendarAttr calendarAttr = new CalendarAttr();
-            calendarAttr.setCalendarType(CalendarAttr.CalendarType.WEEK);
+            calendarAttr.setCalendarType(CalendarAttr.CalendarType.MONTH);
             calendarAttr.setWeekArrayType(weekArrayType);
             Calendar calendar = new Calendar(context, onSelectDateListener, calendarAttr);
             calendar.setOnAdapterSelectListener(new OnAdapterSelectListener() {
@@ -81,14 +75,14 @@ public class CalendarViewAdapter extends PagerAdapter {
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        Log.e("ldf", "setPrimaryItem");
+        Log.e("ldf","setPrimaryItem");
         super.setPrimaryItem(container, position, object);
         this.currentPosition = position;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        Log.e("ldf", "instantiateItem");
+        Log.e("ldf","instantiateItem");
         if (position < 2) {
             return null;
         }
@@ -136,14 +130,6 @@ public class CalendarViewAdapter extends PagerAdapter {
         return calendars;
     }
 
-    public CalendarDate getFirstVisibleDate() {
-        return calendars.get(currentPosition % 3).getFirstDate();
-    }
-
-    public CalendarDate getLastVisibleDate() {
-        return calendars.get(currentPosition % 3).getLastDate();
-    }
-
     public void cancelOtherSelectState() {
         for (int i = 0; i < calendars.size(); i++) {
             Calendar calendar = calendars.get(i);
@@ -163,14 +149,11 @@ public class CalendarViewAdapter extends PagerAdapter {
 
     public void setMarkData(HashMap<String, String> markData) {
         Utils.setMarkData(markData);
-        notifyDataChanged();
     }
 
     public void switchToMonth() {
         if (calendars != null && calendars.size() > 0 && calendarType != CalendarAttr.CalendarType.MONTH) {
-            if (onCalendarTypeChangedListener != null) {
-                onCalendarTypeChangedListener.onCalendarTypeChanged(CalendarAttr.CalendarType.MONTH);
-            }
+            onCalendarTypeChangedListener.onCalendarTypeChanged(CalendarAttr.CalendarType.MONTH);
             calendarType = CalendarAttr.CalendarType.MONTH;
             MonthPager.CURRENT_DAY_INDEX = currentPosition;
             Calendar v = calendars.get(currentPosition % 3);//0
@@ -197,9 +180,7 @@ public class CalendarViewAdapter extends PagerAdapter {
     public void switchToWeek(int rowIndex) {
         rowCount = rowIndex;
         if (calendars != null && calendars.size() > 0 && calendarType != CalendarAttr.CalendarType.WEEK) {
-            if (onCalendarTypeChangedListener != null) {
-                onCalendarTypeChangedListener.onCalendarTypeChanged(CalendarAttr.CalendarType.WEEK);
-            }
+            onCalendarTypeChangedListener.onCalendarTypeChanged(CalendarAttr.CalendarType.WEEK);
             calendarType = CalendarAttr.CalendarType.WEEK;
             MonthPager.CURRENT_DAY_INDEX = currentPosition;
             Calendar v = calendars.get(currentPosition % 3);
@@ -234,7 +215,7 @@ public class CalendarViewAdapter extends PagerAdapter {
         }
     }
 
-    public void notifyMonthDataChanged(CalendarDate date) {
+    public void notifyMonthDataChanged(CalendarDate date){
         seedDate = date;
         refreshCalendar();
     }
@@ -291,6 +272,15 @@ public class CalendarViewAdapter extends PagerAdapter {
         }
     }
 
+
+    public static void saveSelectedDate(CalendarDate calendarDate) {
+        date = calendarDate;
+    }
+
+    public static CalendarDate loadSelectedDate() {
+        return date;
+    }
+
     public CalendarAttr.CalendarType getCalendarType() {
         return calendarType;
     }
@@ -315,11 +305,11 @@ public class CalendarViewAdapter extends PagerAdapter {
         this.onCalendarTypeChangedListener = onCalendarTypeChangedListener;
     }
 
-    public CalendarAttr.WeekArrayType getWeekArrayType() {
-        return weekArrayType;
-    }
-
     public interface OnCalendarTypeChanged {
         void onCalendarTypeChanged(CalendarAttr.CalendarType type);
+    }
+
+    public CalendarAttr.WeekArrayType getWeekArrayType() {
+        return weekArrayType;
     }
 }
